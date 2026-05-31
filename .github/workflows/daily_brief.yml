@@ -2,9 +2,8 @@ name: FI Daily Brief
 
 on:
   schedule:
-    # 12:00 UTC = 7:00 AM EST (UTC-5), weekdays only
-    # Note: during EDT (UTC-4, Mar-Nov) this runs at 8:00 AM ET
-    - cron: '0 12 * * 1-5'
+    - cron: '0 11 * * 1-5'  # 7:00 AM EDT (UTC-4, Mar-Nov)
+    - cron: '0 12 * * 1-5'  # 7:00 AM EST (UTC-5, Nov-Mar)
   workflow_dispatch:  # Allows manual trigger from the GitHub Actions UI
 
 jobs:
@@ -23,8 +22,19 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Check if 7am ET
+        run: |
+          ET_HOUR=$(TZ="America/New_York" date +"%H")
+          echo "Current ET hour: $ET_HOUR"
+          if [ "$ET_HOUR" != "07" ]; then
+            echo "Not 7am ET — skipping."
+            echo "SKIP=true" >> $GITHUB_ENV
+          fi
+
       - name: Write .env from secret
+        if: env.SKIP != 'true'
         run: echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Run FI Daily Brief
+        if: env.SKIP != 'true'
         run: python main.py
