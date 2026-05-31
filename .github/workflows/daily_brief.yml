@@ -2,9 +2,9 @@ name: FI Daily Brief
 
 on:
   schedule:
-    # 12:00 UTC = 7:00 AM EST (UTC-5)
+    # 12:00 UTC = 7:00 AM EST (UTC-5), weekdays only
     # Note: during EDT (UTC-4, Mar-Nov) this runs at 8:00 AM ET
-    - cron: '0 12 * * *'
+    - cron: '0 12 * * 1-5'
   workflow_dispatch:  # Allows manual trigger from the GitHub Actions UI
 
 jobs:
