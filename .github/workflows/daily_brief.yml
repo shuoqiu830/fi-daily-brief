@@ -1,0 +1,30 @@
+name: FI Daily Brief
+
+on:
+  schedule:
+    # 12:00 UTC = 7:00 AM EST (UTC-5)
+    # Note: during EDT (UTC-4, Mar-Nov) this runs at 8:00 AM ET
+    - cron: '0 12 * * *'
+  workflow_dispatch:  # Allows manual trigger from the GitHub Actions UI
+
+jobs:
+  send-brief:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write .env from secret
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Run FI Daily Brief
+        run: python main.py

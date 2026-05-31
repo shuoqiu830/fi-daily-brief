@@ -1,0 +1,14 @@
+# Credentials — never commit
+.env
+
+# Generated preview files
+preview.html
+preview.txt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Misc
+.claude/
