@@ -2,8 +2,8 @@ name: FI Daily Brief
 
 on:
   schedule:
-    - cron: '0 11 * * 1-5'  # 7:00 AM EDT (UTC-4, Mar-Nov)
-    - cron: '0 12 * * 1-5'  # 7:00 AM EST (UTC-5, Nov-Mar)
+    - cron: '0 11 * * *'  # 7:00 AM EDT (UTC-4, Mar-Nov)
+    - cron: '0 12 * * *'  # 7:00 AM EST (UTC-5, Nov-Mar)
   workflow_dispatch:  # Allows manual trigger from the GitHub Actions UI
 
 jobs:
