@@ -9,7 +9,9 @@ Usage:
 
 import sys
 import os
+import traceback
 from pathlib import Path
+from datetime import datetime
 from dotenv import load_dotenv
 
 # Load .env from the project directory
@@ -97,6 +99,29 @@ Configure your .env file and run `python main.py` for a live brief.
     send_email(test_brief)
 
 
+LOG_FILE = Path(__file__).parent / "run.log"
+
+
+def log(msg: str):
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    line = f"[{ts}] {msg}"
+    print(line)
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(line + "\n")
+
+
+def already_ran_today() -> bool:
+    """Return True if a successful run was already logged for today."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    if not LOG_FILE.exists():
+        return False
+    with open(LOG_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            if today in line and "SUCCESS: Email sent." in line:
+                return True
+    return False
+
+
 if __name__ == "__main__":
     check_config()
 
@@ -107,5 +132,14 @@ if __name__ == "__main__":
         print("Sending test email...")
         run_test()
     else:
-        print("Running full daily brief...")
-        run_send()
+        if already_ran_today():
+            log("Skipping: already ran successfully today.")
+            sys.exit(0)
+        log("Starting full daily brief...")
+        try:
+            run_send()
+            log("SUCCESS: Email sent.")
+        except Exception as e:
+            log(f"ERROR: {e}")
+            log(traceback.format_exc())
+            sys.exit(1)
